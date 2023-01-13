@@ -1,0 +1,30 @@
+grammar Lab2 ;
+@header {
+package lab2;
+}
+
+start
+    | NAME r t
+    ;
+
+r
+    | AMPERSAND NAME
+    | v
+    ;
+
+v
+    | ASTERISK v
+    | NAME
+    ;
+
+t
+    | COMMA r t
+    | SEMICOLON
+    ;
+
+NAME : ~[a-zA-Z]+~ ;
+ASTERISK : ~\\*~ ;
+COMMA : ~,~ ;
+SEMICOLON : ~;~ ;
+AMPERSAND : ~&~ ;
+WS : ~[\t\n\r ]+~ -> skip ;

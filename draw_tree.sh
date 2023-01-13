@@ -1,0 +1,1 @@
+dot -Tsvg input.dot > output.svg

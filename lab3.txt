@@ -1,0 +1,96 @@
+grammar Lab3 ;
+type {String} ;
+@header {
+package lab3;
+import java.util.stream.Collectors;
+import java.util.Arrays;
+}
+
+start
+    | block                         {block.getValue()}
+    ;
+
+block
+    | COMB act block                {String.format("%s\n%s", act.getValue(), block.getValue())}
+    | act                           {act.getValue()}
+    ;
+
+act
+    | fi                            {fi.getValue()}
+    | func                          {func.getValue()}
+    ;
+
+func
+    | assigning                     {assigning.getValue()}
+    | print                         {print.getValue()}
+    | wh                            {wh.getValue()}
+    ;
+
+wh
+    | WHILE expr block              {String.format("while %s:\n%s", expr.getValue(), Arrays.stream(block.getValue().split("\n")).collect(Collectors.joining("\n    ", "    ", "")))}
+    ;
+
+expr
+    | op expr r_expr                {String.format("(%s %s %s)", expr.getValue(), op.getValue(), r_expr.getValue())}
+    | NUM                           {NUM.getValue()}
+    | VAR                           {VAR.getValue()}
+    ;
+
+r_expr
+    | expr                          {expr.getValue()}
+    ;
+
+fi
+    | IF expr block else_block      {String.format("if %s:\n%s%s", expr.getValue(), Arrays.stream(block.getValue().split("\n")).collect(Collectors.joining("\n    ", "    ", "")), else_block.getValue())}
+    ;
+
+else_block
+    | func                          {String.format("\nelse:\n%s", Arrays.stream(func.getValue().split("\n")).collect(Collectors.joining("\n    ", "    ", "")))}
+    | IF expr block else_block      {String.format("\nelif %s:\n%s%s", expr.getValue(), Arrays.stream(block.getValue().split("\n")).collect(Collectors.joining("\n    ", "    ", "")), else_block.getValue())}
+    ;
+
+assigning
+    | ASSIGMENT VAR expr            {String.format("%s = %s", VAR.getValue(), expr.getValue())}
+    ;
+
+print
+    | PRINT s_expr                  {String.format("print%s", s_expr.getValue())}
+    ;
+
+s_expr
+    | op expr r_expr                {String.format("(%s %s %s)", expr.getValue(), op.getValue(), r_expr.getValue())}
+    | NUM                           {String.format("(%s)", NUM.getValue())}
+    | VAR                           {String.format("(%s)", VAR.getValue())}
+    ;
+
+op
+    | ADD                           {"+"}
+    | SUB                           {"-"}
+    | MUL                           {"*"}
+    | DIV                           {"/"}
+    | LESS                          {"<"}
+    | GREATER                       {">"}
+    | AND                           {"and"}
+    | OR                            {"or"}
+    | XOR                           {"xor"}
+    | EQUALS                        {"=="}
+    ;
+
+ADD : ~\\+~ ;
+SUB : ~-~ ;
+MUL : ~\\*~ ;
+DIV : ~/~ ;
+LESS : ~<~ ;
+GREATER : ~>~ ;
+AND : ~and~ ;
+OR : ~or~ ;
+XOR : ~xor~ ;
+ASSIGMENT : ~=~ ;
+EQUALS : ~==~ ;
+PRINT : ~print~ ;
+IF : ~if~ ;
+WHILE : ~while~ ;
+COMB : ~comb~ ;
+WS : ~[\t\r\n ]+~ -> skip ;
+NUM : ~[0-9]+~                      {%s} ;
+VAR : ~[a-zA-Z]+~                   {%s} ;
